@@ -15,7 +15,7 @@ export default class GameController {
   constructor(gamePlay, stateService) {
     this.gamePlay = gamePlay;
     this.stateService = stateService;
-    this.state = null;
+    this.state = new GameState();
     this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
     this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
     this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
@@ -27,7 +27,7 @@ export default class GameController {
   init() {
     this.gamePlay.drawUi(themes.prairie);
     this.loadGame();
-    if (this.state === null) {
+    if (this.state.positions.length === 0) {
       this.newGame();
     }
   }
@@ -128,11 +128,15 @@ export default class GameController {
       this.deselectAll();
     }
     try {
-      this.state = GameState.from(this.stateService.load());
-      this.gamePlay.drawUi(this.state.theme);
-      this.gamePlay.redrawPositions(this.state.positions);
+      const loaded = this.stateService.load();
+      if (loaded !== null) {
+        this.state = GameState.from(loaded);
+        this.gamePlay.drawUi(this.state.theme);
+        this.gamePlay.redrawPositions(this.state.positions);
+      }
     } catch (e) {
       GamePlay.showError(e);
+      console.error(e);
     }
   }
 
@@ -184,7 +188,7 @@ export default class GameController {
   attack(pChar, targetPChar) {
     const damage = calcDamage(pChar.character.attack, targetPChar.character.defence);
     targetPChar.character.health -= damage;
-    this.gamePlay.showDamage(targetPChar.position, damage).then(() => {
+    this.gamePlay.showDamage(targetPChar.position, damage.toFixed(0)).then(() => {
       if (targetPChar.character.health <= 0) {
         this.characterDeath(targetPChar);
         if (this.state.enemyPositions.length === 0) {
@@ -264,14 +268,14 @@ export default class GameController {
     else if (toAvoid[0] && toAttack.length === 0) { // Есть опасность со стороны игрока, цели нет
       const safeCell = this.searchSafeZone(toAvoid[0].enemy, toAvoid[0].player);
       if (safeCell === -1) { // Безопасной зоны нет - случайное перемещение по полю
-        this.randomEnemyMove(false);
+        this.randomEnemyMove();
       }
       else { // Персонаж уходит из зоны поражения 
         this.move(toAvoid[0].enemy, safeCell);
       }
     }
-    else { // Доступной цели и опасности нет, случайный ход, по возможности в безопасную зону 
-      this.randomEnemyMove(true);
+    else { // Доступной цели и опасности нет, случайное перемещение 
+      this.randomEnemyMove();
     }
   }
 
@@ -303,24 +307,7 @@ export default class GameController {
     return -1;
   }
 
-  randomEnemyMove(searchSafeZone) {
-    if (searchSafeZone) { // Искать клетку вне радиуса атаки игрока
-      const safeCells = [];
-      this.state.playerPositions.forEach(player => {
-        this.state.enemyPositions.forEach(enemy => {
-          const index = this.searchSafeZone(enemy, player);
-          if (index != -1) {
-            safeCells.push({ enemy, index });
-          }
-        });
-      });
-      if (safeCells.length > 0) {
-        const safe = safeCells[Math.floor(Math.random() * safeCells.length)];
-        this.move(safe.enemy, safe.index);
-        return;
-      }
-    }
-    // Случайное перемещение случайного противника по полю
+  randomEnemyMove() {
     const randomEnemy = this.state.enemyPositions[Math.floor(Math.random()
       * this.state.enemyPositions.length)];
     const current = getCoord(randomEnemy.position, this.gamePlay.boardSize);
@@ -349,7 +336,6 @@ export default class GameController {
       targetCoord.row = Math.max(0, Math.min(targetCoord.row, this.gamePlay.boardSize - 1));
       targetCoord.col = Math.max(0, Math.min(targetCoord.col, this.gamePlay.boardSize - 1));
     } while (!this.canMove(randomEnemy, coordToIndex(targetCoord, this.gamePlay.boardSize)));
-
     this.move(randomEnemy, coordToIndex(targetCoord, this.gamePlay.boardSize));
   }
 
@@ -367,12 +353,11 @@ export default class GameController {
     }
     this.state.level += 1;
     character.level += 1;
-    character.attack = Math.floor(Math.max(character.attack,
-      character.attack * (80 + character.health) / 100));
-    character.defence = Math.floor(Math.max(character.defence,
-      character.defence * (80 + character.health) / 100));
-    character.health = Math.floor(Math.min(100, character.health + 80));
-
+    character.attack = Math.max(character.attack,
+      character.attack * (80 + character.health) / 100);
+    character.defence = Math.max(character.defence,
+      character.defence * (80 + character.health) / 100);
+    character.health = Math.min(100, character.health + 80);
     const playerPositions = generatePositions(this.state.playerPositions.length, [0, 1], this.gamePlay.boardSize)
     for (let i = 0; i < this.state.playerPositions.length; i++) {
       this.state.playerPositions[i].position = playerPositions[i];

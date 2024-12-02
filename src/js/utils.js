@@ -62,7 +62,10 @@ export function calcHealthLevel(health) {
 }
 
 export function characterStats(character) {
-  return `\u{1F396}${character.level} \u{2694}${character.attack} \u{1F6E1}${character.defence} \u{2764}${character.health}`;
+  const attack = character.attack.toFixed(0);
+  const defence = character.defence.toFixed(0);
+  const health = character.health.toFixed(0);
+  return `\u{1F396}${character.level} \u{2694}${attack} \u{1F6E1}${defence} \u{2764}${health}`;
 }
 
 export function isEnemy(character) {

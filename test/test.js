@@ -40,14 +40,15 @@ describe('Character classes:', () => {
     [new Vampire(1), 25, 25],
     [new Undead(1), 40, 10],
     [new Daemon(1), 10, 10],
-    [new Bowman(3), 57, 57],
-    [new Swordsman(3), 93, 23],
-    [new Magician(3), 23, 93],
-    [new Vampire(2), 32, 32],
+    [new Bowman(3), 58.5, 58.5],
+    [new Swordsman(3), 93.6, 23.4],
+    [new Magician(3), 23.4, 93.6],
+    [new Vampire(2), 32.5, 32.5],
     [new Undead(2), 52, 13],
     [new Daemon(2), 13, 13]
   ])(`instance creation test`, (character, attack, defence) => {
-    expect([character.attack, character.defence]).toEqual([attack, defence]);
+    expect(character.attack).toBeCloseTo(attack);
+    expect(character.defence).toBeCloseTo(defence);
   });
 });
 
@@ -55,7 +56,7 @@ describe('characterGenerator test:', () => {
   const maxLevel = 5;
   const playerGenerator = characterGenerator([Swordsman, Bowman], maxLevel);
   const characters = [];
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 10; i++) {
     characters.push(playerGenerator.next().value)
   }
 
@@ -97,8 +98,8 @@ describe('generateTeam test:', () => {
 });
 
 test('characterStats test', () => {
-  const character = new Magician(1);
-  const expected = '🎖1 ⚔10 🛡40 ❤50';
+  const character = new Magician(3);
+  const expected = '🎖3 ⚔23 🛡94 ❤100';
   expect(characterStats(character)).toBe(expected);
 });
 

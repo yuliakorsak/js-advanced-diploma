@@ -1,6 +1,6 @@
 import themes from "./themes";
 export default class GameState {
-  constructor(playerPositions, enemyPositions, theme = themes.prairie, level = 1) {
+  constructor(playerPositions = [], enemyPositions = [], theme = themes.prairie, level = 1) {
     this.playerPositions = playerPositions;
     this.enemyPositions = enemyPositions;
     this.theme = theme;
