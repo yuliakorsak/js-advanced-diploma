@@ -1,5 +1,4 @@
 /**
- * @todo
  * @param index - индекс поля
  * @param boardSize - размер квадратного поля (в длину или ширину)
  * @returns строка - тип ячейки на поле:
@@ -23,7 +22,30 @@
  * ```
  * */
 export function calcTileType(index, boardSize) {
-  // TODO: ваш код будет тут
+  if (index < boardSize) {
+    if (index === 0) {
+      return 'top-left';
+    }
+    if (index === boardSize - 1) {
+      return 'top-right';
+    }
+    return 'top';
+  }
+  if (index % boardSize === 0) {
+    if (index === boardSize * (boardSize - 1)) {
+      return 'bottom-left';
+    }
+    return 'left';
+  }
+  if (index % boardSize === boardSize - 1) {
+    if (index === (boardSize * boardSize) - 1) {
+      return 'bottom-right';
+    }
+    return 'right';
+  }
+  if (index > boardSize * (boardSize - 1)) {
+    return 'bottom';
+  }
   return 'center';
 }
 
@@ -37,4 +59,29 @@ export function calcHealthLevel(health) {
   }
 
   return 'high';
+}
+
+export function characterStats(character) {
+  return `\u{1F396}${character.level} \u{2694}${character.attack} \u{1F6E1}${character.defence} \u{2764}${character.health}`;
+}
+
+export function isEnemy(character) {
+  return (character.type === 'undead'
+    || character.type === 'vampire'
+    || character.type === 'daemon');
+}
+
+export function getCoord(index, boardSize) {
+  return {
+    row: Math.floor(index / boardSize),
+    col: index % boardSize
+  };
+}
+
+export function coordToIndex(coord, boardSize) {
+  return coord.row * boardSize + coord.col;
+}
+
+export function calcDamage(attack, defence) {
+  return Math.max(attack - defence, attack * 0.1);
 }

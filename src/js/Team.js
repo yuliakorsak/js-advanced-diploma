@@ -1,8 +1,5 @@
 /**
  * Класс, представляющий персонажей команды
- *
- * @todo Самостоятельно продумайте хранение персонажей в классе
- * Например
  * @example
  * ```js
  * const characters = [new Swordsman(2), new Bowman(1)]
@@ -12,5 +9,7 @@
  * ```
  * */
 export default class Team {
-  // TODO: write your logic here
+  constructor(characters) {
+    this.characters = [...characters];
+  }
 }

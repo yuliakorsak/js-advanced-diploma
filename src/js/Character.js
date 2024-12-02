@@ -14,11 +14,21 @@
  */
 export default class Character {
   constructor(level, type = 'generic') {
+    if (this.constructor === Character) {
+      throw new TypeError('Невозможно создать экземпляр класса Character');
+    }
     this.level = level;
+    this.health = 50;
     this.attack = 0;
     this.defence = 0;
-    this.health = 50;
     this.type = type;
-    // TODO: выбросите исключение, если кто-то использует "new Character()"
+  }
+
+  upgradeStats() {
+    this.attack = Math.floor(Math.max(this.attack,
+      this.attack * (80 + this.health) / 100));
+    this.defence = Math.floor(Math.max(this.defence,
+      this.defence * (80 + this.health) / 100));
+    this.health = Math.floor(Math.min(100, this.health + 80));
   }
 }
