@@ -4,7 +4,7 @@
 
 Уже написан UI и некоторые базовые классы. В рамках дипломной работы необходимо перевести проект на работу с npm (Babel, Webpack, ESLint, Jest) и дописать оставшуюся функциональность. 
 
-Подробное описание задания и стартовые условия: [js-advanced-diploma](https://github.com/netology-code/js-advanced-diploma/)
+Подробное описание задания и стартовые условия: [js-advanced-diploma](https://github.com/netology-code/js-advanced-diploma/tree/4903e7390b9fa5167a9da7115f9419adbe2104df)
 
 ## Концепция игры
 
